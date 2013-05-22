@@ -3,6 +3,7 @@ Flask-Upload
 
 Flask uploader extensions.
 
+
 Installation
 ------------
 
@@ -19,5 +20,3 @@ If you don't have pip installed, try with easy_install::
 
 Features
 --------
-
-* ....
