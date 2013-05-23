@@ -1,14 +1,14 @@
 .PHONY: lint test coverage clean clean-pyc clean-build docs
 
 lint:
-	@flake8 flask_upload tests
+	@flake8 flask_storage tests
 
 test:
 	@nosetests -s
 
 coverage:
 	@rm -f .coverage
-	@nosetests --with-coverage --cover-package=flask_upload --cover-html
+	@nosetests --with-coverage --cover-package=flask_storage --cover-html
 
 clean: clean-build clean-pyc clean-docs
 

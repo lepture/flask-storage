@@ -1,19 +1,19 @@
-Flask-Upload
-============
+Flask-Storage
+=============
 
-Flask uploader extensions.
+Flask upload and storage extensions.
 
 
 Installation
 ------------
 
-Install flask-uploadr is simple with pip_::
+Install flask-storage is simple with pip_::
 
-    $ pip install Flask-Upload
+    $ pip install Flask-Storage
 
 If you don't have pip installed, try with easy_install::
 
-    $ easy_install Flask-Upload
+    $ easy_install Flask-Storage
 
 .. _pip: http://www.pip-installer.org/
 
