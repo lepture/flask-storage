@@ -82,6 +82,17 @@ class LocalStorage(BaseStorage):
 
     def save(self, storage, filename):
         self.check(storage)
+        dest = os.path.join(self.root, filename)
+
+        folder = os.path.dirname(dest)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        if os.path.exists(dest):
+            raise UploadFileExists()
+
+        storage.save(dest)
+        return self.url(filename)
 
 
 class S3Storage(BaseStorage):
@@ -112,3 +123,7 @@ class UpyunStorage(BaseStorage):
 
 class UploadNotAllowed(Exception):
     """This exception is raised if the upload was not allowed."""
+
+
+class UploadFileExists(Exception):
+    """This exception is raised when the uploaded file exits."""
