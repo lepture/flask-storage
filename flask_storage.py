@@ -1,8 +1,19 @@
 # coding: utf-8
+"""
+    flask_storage
+    ~~~~~~~~~~~~~
+
+    :copyright: (c) 2013 Hsiaoming Yang.
+"""
 
 import os
+import logging
+import base64
+import urllib2
 from urlparse import urljoin
 from werkzeug import secure_filename, FileStorage
+
+log = logging.getLogger('flask_storage')
 
 TEXT = ('txt')
 
@@ -109,16 +120,47 @@ class S3Storage(BaseStorage):
 
 
 class UpyunStorage(BaseStorage):
-    def request(self):
-        pass
+    @property
+    def bucket(self):
+        return self.config.get('STORAGE_UPYUN_BUCKET')
+
+    @property
+    def folder(self):
+        return self.config.get('STORAGE_UPYUN_FOLDER')
+
+    @property
+    def root(self):
+        uri = 'http://v0.api.upyun.com/%s/' % self.bucket
+        if self.folder:
+            uri = urljoin(uri, self.folder)
+        return uri
+
+    def request(self, uri, data=None, method=None):
+        username = self.config.get('STORAGE_UPYUN_USERNAME')
+        password = self.config.get('STORAGE_UPYUN_PASSWORD')
+        auth = base64.b64encode('%s:%s' % (username, password))
+        headers = {'Authorization': 'Basic %s' % auth}
+        return make_request(uri, headers=headers, data=data, method=method)
 
     def url(self, filename):
         urlbase = self.config.get('STORAGE_UPYUN_URL')
+        if not urlbase:
+            urlbase = 'http://%s.b0.upaiyun.com/' % self.bucket
+
+        if self.folder:
+            urlbase = urljoin(urlbase, self.folder)
         return urljoin(urlbase, filename)
+
+    def usage(self):
+        uri = '%s?usage' % self.root
+        resp, content = self.request(uri)
+        return content
 
     def save(self, storage, filename):
         self.check(storage)
-        pass
+        uri = urljoin(self.root, filename)
+        self.request(uri, storage.stream, 'PUT')
+        return self.url(filename)
 
 
 class UploadNotAllowed(Exception):
@@ -127,3 +169,24 @@ class UploadNotAllowed(Exception):
 
 class UploadFileExists(Exception):
     """This exception is raised when the uploaded file exits."""
+
+
+def make_request(uri, headers=None, data=None, method=None):
+    if headers is None:
+        headers = {}
+
+    if data and not method:
+        method = 'POST'
+    elif not method:
+        method = 'GET'
+
+    log.debug('Request %r with %r method' % (uri, method))
+    req = urllib2.Request(uri, headers=headers, data=data)
+    req.get_method = lambda: method.upper()
+    try:
+        resp = urllib2.urlopen(req)
+    except urllib2.HTTPError as resp:
+        pass
+    content = resp.read()
+    resp.close()
+    return resp, content
