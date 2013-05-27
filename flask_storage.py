@@ -41,6 +41,45 @@ ARCHIVES = ('gz', 'bz2', 'zip', 'tar', 'tgz', 'txz', '7z')
 EXECUTABLES = ('so', 'ext', 'dll')
 
 
+class Storage(object):
+    def __init__(self, app):
+        self.backends = {}
+        self.backend = None
+
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        self.app = app
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['storage'] = self
+
+    def add_backend(self, name, extensions, config):
+        if config.get('STORAGE_LOCAL_ROOT'):
+            backend = LocalStorage(name, extensions, config)
+        elif config.get('STORAGE_UPYUN_URL'):
+            backend = UpyunStorage(name, extensions, config)
+        elif config.get('STORAGE_S3_URL'):
+            backend = LocalStorage(name, extensions, config)
+        else:
+            raise ValueError('Configuration Error')
+
+        if not self.backend:
+            self.backend = backend
+
+        self.backends[name] = backend
+        return backend
+
+    def __getattr__(self, key):
+        try:
+            return object.__getattribute__(self, key)
+        except AttributeError:
+            app = self.backends.get(key)
+            if app:
+                return app
+            raise AttributeError('No such backend: %s' % key)
+
+
 class BaseStorage(object):
     def __init__(self, name='base', extensions=IMAGES, config=None):
         self.name = name
