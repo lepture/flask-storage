@@ -170,6 +170,9 @@ class UpyunStorage(BaseStorage):
         password = self.config.get('STORAGE_UPYUN_PASSWORD')
         auth = base64.b64encode('%s:%s' % (username, password))
         headers = {'Authorization': 'Basic %s' % auth}
+        if self.config.get('TESTING'):
+            # for testing
+            return (0, 0)
         return make_request(uri, headers=headers, data=data, method=method)
 
     def url(self, filename):
@@ -189,7 +192,7 @@ class UpyunStorage(BaseStorage):
     def save(self, storage, filename):
         self.check(storage)
         uri = urljoin(self.root, filename)
-        self.request(uri, storage.stream, 'PUT')
+        self.request(uri, storage.stream.read(), 'PUT')
         return self.url(filename)
 
 
