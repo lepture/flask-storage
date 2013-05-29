@@ -14,7 +14,7 @@ setup(
     author="Hsiaoming Yang",
     author_email="me@lepture.com",
     url="https://github.com/lepture/flask-uploadr",
-    packages=["flask_storage"],
+    packages=["flask_storage", "flask_storage.contrib"],
     description="Flask upload and storage extensions.",
     long_description=open('README.rst').read(),
     license=open('LICENSE').read(),
