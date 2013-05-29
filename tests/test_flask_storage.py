@@ -1,7 +1,7 @@
 import os
 from flask.ext.testing import TestCase
 from flask import Flask, request
-from flask_storage import Storage
+from flask_storage import LocalStorage, UpyunStorage
 
 
 class BaseCase(TestCase):
@@ -12,12 +12,11 @@ class BaseCase(TestCase):
     def create_app(self):
         app = Flask(__name__)
         app.config.update(self.CONFIG)
-        s = Storage(app)
 
         @app.route('/upload', methods=['POST'])
         def upload():
             image = request.files.get('image')
-            return s.save(image, 'flask.png')
+            return self.storage.save(image, 'flask.png')
 
         return app
 
@@ -32,6 +31,7 @@ class TestLocalStorage(BaseCase):
         STORAGE_LOCAL_ROOT='tmp',
         STORAGE_LOCAL_URL='/url/'
     )
+    storage = LocalStorage('local', None, CONFIG)
 
     def test_upload(self):
         response = self.upload()
@@ -47,6 +47,7 @@ class TestSupressUpyunStorage(BaseCase):
         STORAGE_UPYUN_USERNAME='flask',
         STORAGE_UPYUN_PASSWORD='flask',
     )
+    storage = UpyunStorage('upyun', None, CONFIG)
 
     def test_upload(self):
         response = self.upload()
