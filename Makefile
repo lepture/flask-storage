@@ -4,6 +4,7 @@ lint:
 	@flake8 flask_storage tests
 
 test:
+	@rm -fr tmp
 	@nosetests -s
 
 coverage:

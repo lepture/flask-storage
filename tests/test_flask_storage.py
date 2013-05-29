@@ -1,3 +1,4 @@
+import os
 from flask.ext.testing import TestCase
 from flask import Flask, request
 from flask_storage import Storage
@@ -12,17 +13,16 @@ class BaseCase(TestCase):
         app.testing = True
         s = Storage(app)
 
-        @app.route('/upload', methods=('POST'))
+        @app.route('/upload', methods=['POST'])
         def upload():
-            print request.files
-            return s.save(request.files)
+            image = request.files.get('image')
+            return s.save(image, 'flask.png')
 
         return app
 
     def upload(self):
-        fps = [self.app.open_resource("flask.png") for i in xrange(3)]
-        data = [("uploads-%d.png" % i, fp) for i, fp in enumerate(fps)]
-        response = self.client.post('/upload', data=dict(data))
+        image = self.app.open_resource("flask.png")
+        response = self.client.post('/upload', data={'image': image})
         return response
 
 
@@ -33,4 +33,7 @@ class TestLocalStorage(BaseCase):
     )
 
     def test_upload(self):
-        self.upload()
+        response = self.upload()
+        assert response.status_code == 200
+        assert response.data == '/url/flask.png'
+        assert os.path.exists('tmp/flask.png')
