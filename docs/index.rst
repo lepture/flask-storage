@@ -3,20 +3,42 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Flask-Storage's documentation!
-=========================================
+Flask-Storage
+=============
 
-Contents:
+Flask-Storage is a collection of backends for file storage.
 
-.. toctree::
-   :maxdepth: 2
+The built-in backends:
+
+- Local backend
+- Upyun backend (https://www.upyun.com/)
+
+Installation
+------------
+
+Install the extension with pip::
+
+    $ pip install Flask-Storage
+
+or alternatively if have not pip installed::
+
+    $ easy_install Flask-Storage
 
 
+Configuration
+--------------
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+API Reference
+-------------
 
+This part of the documentation covers ench and every public class or
+function from Flask-Storage.
+
+.. module:: flask_storage
+
+.. autoclass:: LocalStorage
+   :inherited-members:
+
+.. autoclass:: UpyunStorage
+   :inherited-members:
