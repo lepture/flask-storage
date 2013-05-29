@@ -14,14 +14,14 @@ import urllib2
 from werkzeug import secure_filename, FileStorage
 
 __all__ = (
-    'log', 'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
+    'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
     'ARCHIVES', 'EXECUTABLES', 'BaseStorage',
     'UploadNotAllowed', 'UploadFileExists', 'make_request'
 )
 
 log = logging.getLogger('flask_storage')
 
-TEXT = ('txt')
+TEXT = ('txt',)
 
 DOCUMENTS = (
     'rtf', 'odf', 'ods', 'gnumeric', 'abw',

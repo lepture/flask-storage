@@ -10,6 +10,10 @@
 
 # flake8: noqa
 
+from . import _info
+__version__ = _info.VERSION
+__author__ = _info.AUTHOR
+
 from ._base import *
 from .local import LocalStorage
 from .upyun import UpyunStorage
