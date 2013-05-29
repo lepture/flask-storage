@@ -5,12 +5,13 @@ from flask_storage import Storage
 
 
 class BaseCase(TestCase):
-    CONFIG = {}
+    CONFIG = {
+        'TESTING': True
+    }
 
     def create_app(self):
         app = Flask(__name__)
         app.config.update(self.CONFIG)
-        app.testing = True
         s = Storage(app)
 
         @app.route('/upload', methods=['POST'])
@@ -37,3 +38,17 @@ class TestLocalStorage(BaseCase):
         assert response.status_code == 200
         assert response.data == '/url/flask.png'
         assert os.path.exists('tmp/flask.png')
+
+
+class TestSupressUpyunStorage(BaseCase):
+    CONFIG = dict(
+        TESTING=True,
+        STORAGE_UPYUN_BUCKET='storage',
+        STORAGE_UPYUN_USERNAME='flask',
+        STORAGE_UPYUN_PASSWORD='flask',
+    )
+
+    def test_upload(self):
+        response = self.upload()
+        assert response.status_code == 200
+        assert response.data == 'http://storage.b0.upaiyun.com/flask.png'

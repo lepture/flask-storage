@@ -8,6 +8,7 @@ test:
 	@nosetests -s
 
 coverage:
+	@rm -fr tmp
 	@rm -f .coverage
 	@nosetests --with-coverage --cover-package=flask_storage --cover-html
 
