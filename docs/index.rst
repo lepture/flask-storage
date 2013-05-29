@@ -38,7 +38,7 @@ function from Flask-Storage.
 .. module:: flask_storage
 
 .. autoclass:: LocalStorage
-   :inherited-members:
+   :members:
 
 .. autoclass:: UpyunStorage
-   :inherited-members:
+   :members:

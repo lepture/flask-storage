@@ -19,18 +19,36 @@ class LocalStorage(BaseStorage):
         return self.config.get('STORAGE_LOCAL_ROOT')
 
     def url(self, filename):
+        """Generate the url for a filename.
+
+        :param filename: filename for generating the url....
+        """
         urlbase = self.config.get('STORAGE_LOCAL_URL')
         return urljoin(urlbase, filename)
 
     def exists(self, filename):
+        """Detect if the file exists.
+
+        :param filename: name of the file.
+        """
         dest = os.path.join(self.root, filename)
         return os.path.exists(dest)
 
     def delete(self, filename):
+        """Delete the specified file.
+
+        :param filename: name of the file.
+        """
         dest = os.path.join(self.root, filename)
         return os.remove(dest)
 
     def save(self, storage, filename):
+        """Save a storage (`werkzeug.FileStorage`) with the specified
+        filename.
+
+        :param storage: The storage to be saved.
+        :param filename: The destination of the storage.
+        """
         self.check(storage)
         dest = os.path.join(self.root, filename)
 

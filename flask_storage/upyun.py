@@ -30,6 +30,10 @@ class UpyunStorage(BaseStorage):
         return uri
 
     def request(self, uri, data=None, method=None):
+        """Make a request for upyun api.
+
+        You rarely need this API, use save instead.
+        """
         username = self.config.get('STORAGE_UPYUN_USERNAME')
         password = self.config.get('STORAGE_UPYUN_PASSWORD')
         auth = base64.b64encode('%s:%s' % (username, password))
@@ -40,6 +44,10 @@ class UpyunStorage(BaseStorage):
         return make_request(uri, headers=headers, data=data, method=method)
 
     def url(self, filename):
+        """Generate the url for a filename.
+
+        :param filename: Name of the file.
+        """
         urlbase = self.config.get('STORAGE_UPYUN_URL')
         if not urlbase:
             urlbase = 'http://%s.b0.upaiyun.com/' % self.bucket
@@ -49,11 +57,21 @@ class UpyunStorage(BaseStorage):
         return urljoin(urlbase, filename)
 
     def usage(self):
+        """Find the usage of your bucket.
+
+        This function returns an integer.
+        """
         uri = '%s?usage' % self.root
         resp, content = self.request(uri)
         return content
 
     def save(self, storage, filename):
+        """Save a storage (`werkzeug.FileStorage`) with the specified
+        filename.
+
+        :param storage: The storage to be saved.
+        :param filename: The filename you want to save as.
+        """
         self.check(storage)
         uri = urljoin(self.root, filename)
         self.request(uri, storage.stream.read(), 'PUT')
