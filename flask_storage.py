@@ -42,10 +42,8 @@ EXECUTABLES = ('so', 'ext', 'dll')
 
 
 class Storage(object):
+    """Auto detect storage type from flask config"""
     def __init__(self, app):
-        self.backends = {}
-        self.backend = None
-
         if app:
             self.init_app(app)
 
@@ -54,30 +52,23 @@ class Storage(object):
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['storage'] = self
 
-    def add_backend(self, name, extensions, config):
+        config = app.config
+        extensions = config.get('STORAGE_SUPPORTED_EXTENSIONS', None)
         if config.get('STORAGE_LOCAL_ROOT'):
-            backend = LocalStorage(name, extensions, config)
-        elif config.get('STORAGE_UPYUN_URL'):
-            backend = UpyunStorage(name, extensions, config)
-        elif config.get('STORAGE_S3_URL'):
-            backend = LocalStorage(name, extensions, config)
+            backend = LocalStorage('local', extensions, config)
+        elif config.get('STORAGE_UPYUN_BUCKET'):
+            backend = UpyunStorage('upyun', extensions, config)
+        elif config.get('STORAGE_S3_BUCKET'):
+            backend = S3Storage('s3', extensions, config)
         else:
             raise ValueError('Configuration Error')
-
-        if not self.backend:
-            self.backend = backend
-
-        self.backends[name] = backend
-        return backend
+        self.backend = backend
 
     def __getattr__(self, key):
         try:
             return object.__getattribute__(self, key)
         except AttributeError:
-            app = self.backends.get(key)
-            if app:
-                return app
-            raise AttributeError('No such backend: %s' % key)
+            return object.__getattribute__(self.backend, key)
 
 
 class BaseStorage(object):
