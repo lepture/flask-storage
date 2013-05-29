@@ -3,6 +3,8 @@
     flask_storage
     ~~~~~~~~~~~~~
 
+    Collection of storage backends.
+
     :copyright: (c) 2013 Hsiaoming Yang.
 """
 
