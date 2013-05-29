@@ -193,6 +193,16 @@ class UpyunStorage(BaseStorage):
         return self.url(filename)
 
 
+class SaeStorage(BaseStorage):
+    # TODO: @biner
+
+    def url(self, filename):
+        pass
+
+    def save(self, storage, filename):
+        pass
+
+
 class UploadNotAllowed(Exception):
     """This exception is raised if the upload was not allowed."""
 
