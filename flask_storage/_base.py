@@ -48,10 +48,10 @@ EXECUTABLES = ('so', 'ext', 'dll')
 
 
 class BaseStorage(object):
-    def __init__(self, name='base', extensions=IMAGES, config=None):
+    def __init__(self, name='base', extensions=None, config=None):
         self.name = name
         self.config = config
-        self.extensions = extensions
+        self.extensions = extensions or IMAGES
 
     def url(self, filename):
         """This function gets the URL a filename."""
