@@ -11,7 +11,7 @@
 import os
 import logging
 import urllib2
-from werkzeug import secure_filename, FileStorage
+from werkzeug import FileStorage
 
 __all__ = (
     'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
@@ -79,7 +79,7 @@ class BaseStorage(object):
         if not isinstance(storage, FileStorage):
             raise TypeError('storage must be a werkzeug.FileStorage')
 
-        _, extname = os.path.splitext(secure_filename(storage.filename))
+        _, extname = os.path.splitext(storage.filename)
         ext = extname.lower()[1:]
         if not self.extension_allowed(ext):
             raise UploadNotAllowed()
