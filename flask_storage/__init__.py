@@ -19,20 +19,42 @@ from .local import LocalStorage
 from .upyun import UpyunStorage
 
 
-def create(app):
+class Storage(object):
     """Create a storage instance.
 
     :param app: Flask app instance
     """
-    type = app.config.get('STORAGE_TYPE', 'local')
-    name = app.config.get('STORAGE_NAME', type)
-    extensions = app.config.get('STORAGE_EXTENSIONS', None)
 
-    if type == 'upyun':
-        s = UpyunStorage(name, extensions, app.config)
-    else:
-        s = LocalStorage(name, extensions, app.config)
+    def __init__(self, app=None):
+        self.backends = {}
+        self.app = app
+        if app:
+            self.init_app(app)
 
-    app.extensions = getattr(app, 'extensions', {})
-    app.extensions['storage'] = s
-    return s
+    def init_app(self, app):
+        self.app = app
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['storage'] = self
+
+    def add_backend(self, name, backend):
+        self.backends[name] = backend
+        return backend
+
+    def create_backend(self, type, name=None, extensions=None, config=None):
+        if not name:
+            name = type
+
+        if type == 'upyun':
+            s = UpyunStorage(name, extensions, config)
+        else:
+            s = LocalStorage(name, extensions, config)
+        return s
+
+    def __getattr__(self, key):
+        try:
+            return object.__getattribute__(self, key)
+        except AttributeError:
+            backend = self.backends.get(key)
+            if backend:
+                return backend
+            raise AttributeError('No such backend: %s' % key)
