@@ -8,6 +8,7 @@
     :copyright: (c) 2013 Hsiaoming Yang.
 """
 
+import os
 import base64
 from urlparse import urljoin
 from ._base import BaseStorage, make_request
@@ -29,7 +30,7 @@ class UpyunStorage(BaseStorage):
             uri = urljoin(uri, self.folder)
         return uri
 
-    def request(self, uri, data=None, method=None):
+    def request(self, uri, data=None, method=None, headers=None):
         """Make a request for upyun api.
 
         You rarely need this API, use save instead.
@@ -37,7 +38,11 @@ class UpyunStorage(BaseStorage):
         username = self.config.get('STORAGE_UPYUN_USERNAME')
         password = self.config.get('STORAGE_UPYUN_PASSWORD')
         auth = base64.b64encode('%s:%s' % (username, password))
-        headers = {'Authorization': 'Basic %s' % auth}
+
+        if not headers:
+            headers = {}
+
+        headers['Authorization'] = 'Basic %s' % auth
         if self.config.get('TESTING'):
             # for testing
             return (0, 0)
@@ -74,5 +79,10 @@ class UpyunStorage(BaseStorage):
         """
         self.check(storage)
         uri = urljoin(self.root, filename)
-        self.request(uri, storage.stream.read(), 'PUT')
+        headers = {'Mkdir': 'true'}
+        stream = storage.stream
+        if isinstance(stream, file):
+            length = os.fstat(stream.fileno()).st_size
+            headers['Content-Length'] = length
+        self.request(uri, stream, 'PUT', headers)
         return self.url(filename)
