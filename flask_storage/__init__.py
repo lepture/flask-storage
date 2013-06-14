@@ -40,14 +40,17 @@ class Storage(object):
         self.backends[name] = backend
         return backend
 
-    def create_backend(self, type, name=None, extensions=None, config=None):
+    @classmethod
+    def create_backend(cls, type, name=None, extensions=None, config=None):
         if not name:
             name = type
 
+        # TODO: more types
         if type == 'upyun':
             s = UpyunStorage(name, extensions, config)
         else:
             s = LocalStorage(name, extensions, config)
+
         return s
 
     def __getattr__(self, key):

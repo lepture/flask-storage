@@ -1,7 +1,12 @@
 Flask-Storage
 =============
 
-Flask upload and storage extensions.
+Flask-Storage is a collection of backends for file storage.
+
+The built-in backends:
+
+- Local backend
+- Upyun backend (https://www.upyun.com/)
 
 
 Installation
@@ -18,5 +23,5 @@ If you don't have pip installed, try with easy_install::
 .. _pip: http://www.pip-installer.org/
 
 
-Features
---------
+Configuration
+-------------

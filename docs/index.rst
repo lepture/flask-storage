@@ -3,31 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Flask-Storage
-=============
-
-Flask-Storage is a collection of backends for file storage.
-
-The built-in backends:
-
-- Local backend
-- Upyun backend (https://www.upyun.com/)
-
-Installation
-------------
-
-Install the extension with pip::
-
-    $ pip install Flask-Storage
-
-or alternatively if have not pip installed::
-
-    $ easy_install Flask-Storage
-
-
-Configuration
---------------
-
+.. include:: ../README.rst
 
 API Reference
 -------------
