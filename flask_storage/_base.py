@@ -87,6 +87,9 @@ class BaseStorage(object):
     def exists(self, filename):
         raise NotImplementedError
 
+    def read(self, filename):
+        raise NotImplementedError
+
     def delete(self, filename):
         raise NotImplementedError
 
