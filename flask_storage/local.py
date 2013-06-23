@@ -35,11 +35,19 @@ class LocalStorage(BaseStorage):
         return os.path.exists(dest)
 
     def read(self, filename):
-        """Read content of a file.
-        """
+        """Read content of a file."""
         dest = os.path.join(self.root, filename)
         with open(dest) as f:
             return f.read()
+
+    def write(self, filename, content):
+        """Write content to a file."""
+        dest = os.path.join(self.root, filename)
+        dirname = os.path.dirname(dest)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(dest, 'w') as f:
+            return f.write(content)
 
     def delete(self, filename):
         """Delete the specified file.
