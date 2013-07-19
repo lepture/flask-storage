@@ -27,7 +27,8 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'Flask'
+        'Flask',
+        'boto',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
