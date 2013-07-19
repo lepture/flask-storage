@@ -9,8 +9,14 @@
 """
 
 import os
+import sys
 from urlparse import urljoin
 from ._base import BaseStorage, UploadFileExists
+
+if sys.version_info[0] == 3:
+    string_type = str
+else:
+    string_type = unicode
 
 
 class LocalStorage(BaseStorage):
@@ -40,14 +46,15 @@ class LocalStorage(BaseStorage):
         with open(dest) as f:
             return f.read()
 
-    def write(self, filename, content):
+    def write(self, filename, body, headers=None):
         """Write content to a file."""
         dest = os.path.join(self.root, filename)
         dirname = os.path.dirname(dest)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        with open(dest, 'w') as f:
-            return f.write(content)
+
+        with open(dest, 'wb') as f:
+            return f.write(to_bytes(body))
 
     def delete(self, filename):
         """Delete the specified file.
@@ -57,14 +64,17 @@ class LocalStorage(BaseStorage):
         dest = os.path.join(self.root, filename)
         return os.remove(dest)
 
-    def save(self, storage, filename):
+    def save(self, storage, filename, check=True):
         """Save a storage (`werkzeug.FileStorage`) with the specified
         filename.
 
         :param storage: The storage to be saved.
         :param filename: The destination of the storage.
         """
-        self.check(storage)
+
+        if check:
+            self.check(storage)
+
         dest = os.path.join(self.root, filename)
 
         folder = os.path.dirname(dest)
@@ -76,3 +86,9 @@ class LocalStorage(BaseStorage):
 
         storage.save(dest)
         return self.url(filename)
+
+
+def to_bytes(text):
+    if isinstance(text, string_type):
+        text = text.encode('utf-8')
+    return text

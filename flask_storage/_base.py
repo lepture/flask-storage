@@ -82,12 +82,15 @@ class BaseStorage(object):
         _, extname = os.path.splitext(storage.filename)
         ext = extname.lower()[1:]
         if not self.extension_allowed(ext):
-            raise UploadNotAllowed()
+            raise UploadNotAllowed('Extension not allowed')
 
     def exists(self, filename):
         raise NotImplementedError
 
     def read(self, filename):
+        raise NotImplementedError
+
+    def write(self, filename, body, headers=None):
         raise NotImplementedError
 
     def delete(self, filename):
