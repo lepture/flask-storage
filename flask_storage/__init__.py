@@ -10,13 +10,12 @@
 
 # flake8: noqa
 
-from . import _info
-__version__ = _info.VERSION
-__author__ = _info.AUTHOR
+from ._info import VERSION as __version__
+from ._info import AUTHOR as __author__
 
 from ._base import *
 from .local import LocalStorage
-from .upyun import UpyunStorage
+from .s3 import S3Storage
 
 
 class Storage(object):
@@ -45,13 +44,11 @@ class Storage(object):
         if not name:
             name = type
 
-        # TODO: more types
-        if type == 'upyun':
-            s = UpyunStorage(name, extensions, config)
-        else:
-            s = LocalStorage(name, extensions, config)
-
-        return s
+        backends = {
+            'local': LocalStorage,
+            's3': S3Storage,
+        }
+        return backends[type](name, extensions, config)
 
     def __getattr__(self, key):
         try:

@@ -10,8 +10,13 @@
 
 import os
 import logging
-import urllib2
 from werkzeug import FileStorage
+try:
+    from urlparse import urljoin
+    import urllib2 as http
+except ImportError:
+    from urllib.parse import urljoin
+    from urllib import request as http
 
 __all__ = (
     'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
@@ -54,8 +59,12 @@ class BaseStorage(object):
         self.extensions = extensions or IMAGES
 
     def url(self, filename):
-        """This function gets the URL a filename."""
-        raise NotImplementedError
+        """Generate the url for a filename.
+
+        :param filename: filename for generating the url....
+        """
+        urlbase = self.config.get('base_url')
+        return urljoin(urlbase, filename)
 
     def extension_allowed(self, extname):
         if not self.extensions:
@@ -118,11 +127,11 @@ def make_request(uri, headers=None, data=None, method=None):
         method = 'GET'
 
     log.debug('Request %r with %r method' % (uri, method))
-    req = urllib2.Request(uri, headers=headers, data=data)
+    req = http.Request(uri, headers=headers, data=data)
     req.get_method = lambda: method.upper()
     try:
-        resp = urllib2.urlopen(req)
-    except urllib2.HTTPError as resp:
+        resp = http.urlopen(req)
+    except http.HTTPError as resp:
         pass
     content = resp.read()
     resp.close()

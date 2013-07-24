@@ -10,8 +10,7 @@
 
 import os
 import sys
-from urlparse import urljoin
-from ._base import BaseStorage, UploadFileExists
+from ._base import BaseStorage, UploadFileExists, urljoin
 
 if sys.version_info[0] == 3:
     string_type = str
@@ -20,17 +19,16 @@ else:
 
 
 class LocalStorage(BaseStorage):
+    """Storage for local filesystem.
+
+    Configuration:
+
+        - base_dir: save file in base dir
+        - base_url: base url root
+    """
     @property
     def root(self):
-        return self.config.get('STORAGE_LOCAL_ROOT')
-
-    def url(self, filename):
-        """Generate the url for a filename.
-
-        :param filename: filename for generating the url....
-        """
-        urlbase = self.config.get('STORAGE_LOCAL_URL')
-        return urljoin(urlbase, filename)
+        return self.config.get('base_dir')
 
     def exists(self, filename):
         """Detect if the file exists.
