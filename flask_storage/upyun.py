@@ -10,18 +10,17 @@
 
 import os
 import base64
-from urlparse import urljoin
-from ._base import BaseStorage, make_request
+from ._base import BaseStorage, make_request, urljoin
 
 
 class UpyunStorage(BaseStorage):
     @property
     def bucket(self):
-        return self.config.get('STORAGE_UPYUN_BUCKET')
+        return self.config.get('bucket')
 
     @property
     def folder(self):
-        return self.config.get('STORAGE_UPYUN_FOLDER')
+        return self.config.get('folder')
 
     @property
     def root(self):
@@ -35,8 +34,8 @@ class UpyunStorage(BaseStorage):
 
         You rarely need this API, use save instead.
         """
-        username = self.config.get('STORAGE_UPYUN_USERNAME')
-        password = self.config.get('STORAGE_UPYUN_PASSWORD')
+        username = self.config.get('username')
+        password = self.config.get('password')
         auth = base64.b64encode('%s:%s' % (username, password))
 
         if not headers:
@@ -53,7 +52,7 @@ class UpyunStorage(BaseStorage):
 
         :param filename: Name of the file.
         """
-        urlbase = self.config.get('STORAGE_UPYUN_URL')
+        urlbase = self.config.get('base_url')
         if not urlbase:
             urlbase = 'http://%s.b0.upaiyun.com/' % self.bucket
 
