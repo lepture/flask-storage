@@ -8,6 +8,7 @@
     :copyright: (c) 2013 Hsiaoming Yang.
 """
 
+import mimetypes
 from werkzeug import cached_property
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -26,21 +27,46 @@ class S3Storage(BaseStorage):
         params = self.config.get('connection_params', {})
         return S3Connection(access_key, secret_key, **params)
 
-    @property
+    @cached_property
     def bucket(self):
-        return self.config.get('bucket')
+        name = self.config.get('bucket')
+        if name not in self._connection:
+            return self._connection.create_bucket(name)
+        return self._connection.get_bucket(name)
 
-    @property
+    @cached_property
     def folder(self):
         return self.config.get('folder')
 
     def read(self, filename):
-        pass
+        if self.folder:
+            filename = '%s/%s' % (self.folder, filename)
+        k = self.bucket.get_key(filename)
+        if not k:
+            return None
+        return k.read()
+
+    def _generate_key(self, filename, headers=None):
+        if self.folder:
+            filename = '%s/%s' % (self.folder, filename)
+
+        k = self.bucket.new_key(filename)
+        if not headers or 'Content-Type' not in headers:
+            ct = mimetypes.guess_type(filename)[0]
+            if ct:
+                k.set_metadata('Content-Type', ct)
+
+        return k
 
     def write(self, filename, body, headers=None):
-        pass
+        k = self._generate_key(filename, headers)
+        # since Flask-Storage is designed for public storage
+        # we need to set it public-read
+        return k.set_contents_from_string(
+            body, headers=headers, policy='public-read'
+        )
 
-    def save(self, storage, filename, check=True):
+    def save(self, storage, filename, headers=None, check=True):
         """Save a storage (`werkzeug.FileStorage`) with the specified
         filename.
 
@@ -50,3 +76,8 @@ class S3Storage(BaseStorage):
 
         if check:
             self.check(storage)
+
+        k = self._generate_key(filename)
+        return k.set_contents_from_stream(
+            storage.stream, headers=headers, policy='public-read'
+        )
