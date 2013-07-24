@@ -11,7 +11,6 @@
 from werkzeug import cached_property
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-
 from ._base import BaseStorage, UploadFileExists, urljoin
 
 
@@ -27,10 +26,18 @@ class S3Storage(BaseStorage):
         params = self.config.get('connection_params', {})
         return S3Connection(access_key, secret_key, **params)
 
+    @property
+    def bucket(self):
+        return self.config.get('bucket')
+
+    @property
+    def folder(self):
+        return self.config.get('folder')
+
     def read(self, filename):
         pass
 
-    def write(self, filename):
+    def write(self, filename, body, headers=None):
         pass
 
     def save(self, storage, filename, check=True):

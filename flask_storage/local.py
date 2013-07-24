@@ -9,13 +9,8 @@
 """
 
 import os
-import sys
-from ._base import BaseStorage, UploadFileExists, urljoin
-
-if sys.version_info[0] == 3:
-    string_type = str
-else:
-    string_type = unicode
+from ._compat import to_bytes
+from ._base import BaseStorage, UploadFileExists
 
 
 class LocalStorage(BaseStorage):
@@ -84,9 +79,3 @@ class LocalStorage(BaseStorage):
 
         storage.save(dest)
         return self.url(filename)
-
-
-def to_bytes(text):
-    if isinstance(text, string_type):
-        text = text.encode('utf-8')
-    return text
