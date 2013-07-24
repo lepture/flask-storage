@@ -38,6 +38,16 @@ class S3Storage(BaseStorage):
     def folder(self):
         return self.config.get('folder')
 
+    def url(self, filename):
+        """Generate the url for a filename.
+
+        :param filename: filename for generating the url
+        """
+        if self.folder:
+            filename = '%s/%s' % (self.folder, filename)
+        urlbase = self.config.get('base_url')
+        return urljoin(urlbase, filename)
+
     def read(self, filename):
         if self.folder:
             filename = '%s/%s' % (self.folder, filename)
