@@ -11,8 +11,7 @@
 import mimetypes
 from werkzeug import cached_property
 from boto.s3.connection import S3Connection
-from boto.s3.key import Key
-from ._base import BaseStorage, UploadFileExists, urljoin
+from ._base import BaseStorage, urljoin
 
 
 class S3Storage(BaseStorage):
