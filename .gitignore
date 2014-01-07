@@ -15,3 +15,4 @@ cover/
 tmp/
 .tox
 .cache
+.coverage
