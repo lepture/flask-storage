@@ -19,7 +19,7 @@ setup(
     author=author,
     author_email=author_email,
     url=info.REPOSITORY,
-    packages=["flask_storage", "flask_storage.contrib"],
+    packages=["flask_storage"],
     description="Flask upload and storage extensions.",
     long_description=open('README.rst').read(),
     license=open('LICENSE').read(),
