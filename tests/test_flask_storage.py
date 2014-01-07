@@ -1,9 +1,11 @@
 import os
+import unittest
+
 from flask import Flask, request
 from flask_storage.local import LocalStorage
 
 
-class BaseCase(object):
+class BaseCase(unittest.TestCase):
     CONFIG = {
         'TESTING': True
     }
