@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 
 from flask import Flask, request
@@ -37,6 +38,18 @@ class TestLocalStorage(BaseCase):
         base_url='/url/'
     )
     storage = LocalStorage('local', None, CONFIG)
+
+    def setUp(self):
+        super(TestLocalStorage, self).setUp()
+        self._clean_up()
+
+    def tearDown(self):
+        super(TestLocalStorage, self).tearDown()
+        self._clean_up()
+
+    def _clean_up(self):
+        if os.path.isdir(self.CONFIG['base_dir']):
+            shutil.rmtree(self.CONFIG['base_dir'])
 
     def test_upload(self):
         response = self.upload()
