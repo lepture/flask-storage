@@ -9,9 +9,15 @@
 """
 
 import os
+import log
 import base64
+
 from ._base import BaseStorage
 from ._compat import http, urljoin
+from ._utils import ConfigItem
+
+
+_missing = object()
 
 
 def http_request(uri, headers=None, data=None, method=None):
@@ -36,13 +42,15 @@ def http_request(uri, headers=None, data=None, method=None):
 
 
 class UpyunStorage(BaseStorage):
-    @property
-    def bucket(self):
-        return self.config.get('bucket')
 
-    @property
-    def folder(self):
-        return self.config.get('folder')
+    bucket = ConfigItem('bucket')
+    folder = ConfigItem('folder')
+    base_url = ConfigItem('base_url', default=_missing)
+
+    username = ConfigItem('username')
+    password = ConfigItem('password')
+
+    is_testing = ConfigItem('TESTING')
 
     @property
     def root(self):
@@ -56,16 +64,13 @@ class UpyunStorage(BaseStorage):
 
         You rarely need this API, use save instead.
         """
-        username = self.config.get('username')
-        password = self.config.get('password')
-        auth = base64.b64encode('%s:%s' % (username, password))
+        auth = base64.b64encode('%s:%s' % (self.username, self.password))
 
         if not headers:
             headers = {}
 
         headers['Authorization'] = 'Basic %s' % auth
-        if self.config.get('TESTING'):
-            # for testing
+        if self.is_testing:
             return (0, 0)
         return http_request(uri, headers=headers, data=data, method=method)
 
@@ -74,12 +79,14 @@ class UpyunStorage(BaseStorage):
 
         :param filename: Name of the file.
         """
-        urlbase = self.config.get('base_url')
-        if not urlbase:
-            urlbase = 'http://%s.b0.upaiyun.com/' % self.bucket
+        if self.base_url is _missing:
+            base_url = 'http://%s.b0.upaiyun.com/' % self.bucket
+        else:
+            base_url = self.base_url
 
         if self.folder:
-            urlbase = urljoin(urlbase, self.folder)
+            urlbase = urljoin(base_url, self.folder)
+
         return urljoin(urlbase, filename)
 
     def usage(self):

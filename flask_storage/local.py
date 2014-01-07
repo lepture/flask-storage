@@ -11,6 +11,7 @@
 import os
 from ._compat import to_bytes
 from ._base import BaseStorage, UploadFileExists
+from ._utils import ConfigItem
 
 
 class LocalStorage(BaseStorage):
@@ -21,9 +22,8 @@ class LocalStorage(BaseStorage):
         - base_dir: save file in base dir
         - base_url: base url root
     """
-    @property
-    def root(self):
-        return self.config.get('base_dir')
+
+    root = ConfigItem('base_dir')
 
     def exists(self, filename):
         """Detect if the file exists.
