@@ -1,13 +1,16 @@
 import os
-from flask.ext.testing import TestCase
 from flask import Flask, request
-from flask_storage import LocalStorage, UpyunStorage
+from flask_storage.local import LocalStorage
 
 
-class BaseCase(TestCase):
+class BaseCase(object):
     CONFIG = {
         'TESTING': True
     }
+
+    def setUp(self):
+        self.app = self.create_app()
+        self.client = self.app.test_client()
 
     def create_app(self):
         app = Flask(__name__)
@@ -28,8 +31,8 @@ class BaseCase(TestCase):
 
 class TestLocalStorage(BaseCase):
     CONFIG = dict(
-        STORAGE_LOCAL_ROOT='tmp',
-        STORAGE_LOCAL_URL='/url/'
+        base_dir='tmp',
+        base_url='/url/'
     )
     storage = LocalStorage('local', None, CONFIG)
 
@@ -38,18 +41,3 @@ class TestLocalStorage(BaseCase):
         assert response.status_code == 200
         assert response.data == '/url/flask.png'
         assert os.path.exists('tmp/flask.png')
-
-
-class TestSupressUpyunStorage(BaseCase):
-    CONFIG = dict(
-        TESTING=True,
-        STORAGE_UPYUN_BUCKET='storage',
-        STORAGE_UPYUN_USERNAME='flask',
-        STORAGE_UPYUN_PASSWORD='flask',
-    )
-    storage = UpyunStorage('upyun', None, CONFIG)
-
-    def test_upload(self):
-        response = self.upload()
-        assert response.status_code == 200
-        assert response.data == 'http://storage.b0.upaiyun.com/flask.png'

@@ -11,6 +11,7 @@
 import os
 import logging
 from werkzeug import FileStorage
+from ._compat import urljoin
 
 
 __all__ = (
