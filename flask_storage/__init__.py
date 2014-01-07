@@ -12,10 +12,14 @@
 
 from ._info import VERSION as __version__
 from ._info import AUTHOR as __author__
+from werkzeug.utils import import_string
 
-from ._base import *
-from .local import LocalStorage
-from .s3 import S3Storage
+
+backends = {
+    'local': 'flask_storage.local.LocalStorage',
+    's3': 'flask_storage.s3.S3Storage',
+    'upyun': 'flask_storage.upyun.UpyunStorage',
+}
 
 
 class Storage(object):
@@ -25,36 +29,28 @@ class Storage(object):
     """
 
     def __init__(self, app=None):
-        self.backends = {}
+        self._backend = None
         self.app = app
         if app:
             self.init_app(app)
 
     def init_app(self, app):
         self.app = app
-        app.extensions = getattr(app, 'extensions', {})
-        app.extensions['storage'] = self
+        app.config.setdefault('STORAGE_TYPE', 'local')
+        t = app.config.get('STORAGE_TYPE')
+        assert t in backends, "Storage type not supported."
 
-    def add_backend(self, name, backend):
-        self.backends[name] = backend
-        return backend
+        Backend = import_string(backends[t])
+        name = app.config.get('STORAGE_NAME', t)
+        extensions = app.config.get('STORAGE_EXTENSIONS', None)
+        config = app.config.get('STORAGE_CONFIG', {})
 
-    @classmethod
-    def create_backend(cls, type, name=None, extensions=None, config=None):
-        if not name:
-            name = type
-
-        backends = {
-            'local': LocalStorage,
-            's3': S3Storage,
-        }
-        return backends[type](name, extensions, config)
+        self._backend = Backend(name, extensions, config)
 
     def __getattr__(self, key):
         try:
             return object.__getattribute__(self, key)
         except AttributeError:
-            backend = self.backends.get(key)
-            if backend:
-                return backend
-            raise AttributeError('No such backend: %s' % key)
+            if self._backend is None:
+                raise RuntimeError("Backend not configured.")
+            return getattr(self._backend, key)

@@ -10,7 +10,29 @@
 
 import os
 import base64
-from ._base import BaseStorage, make_request, urljoin
+from ._base import BaseStorage
+from ._compat import http, urljoin
+
+
+def http_request(uri, headers=None, data=None, method=None):
+    if headers is None:
+        headers = {}
+
+    if data and not method:
+        method = 'POST'
+    elif not method:
+        method = 'GET'
+
+    log.debug('Request %r with %r method' % (uri, method))
+    req = http.Request(uri, headers=headers, data=data)
+    req.get_method = lambda: method.upper()
+    try:
+        resp = http.urlopen(req)
+    except http.HTTPError as resp:
+        pass
+    content = resp.read()
+    resp.close()
+    return resp, content
 
 
 class UpyunStorage(BaseStorage):
@@ -45,7 +67,7 @@ class UpyunStorage(BaseStorage):
         if self.config.get('TESTING'):
             # for testing
             return (0, 0)
-        return make_request(uri, headers=headers, data=data, method=method)
+        return http_request(uri, headers=headers, data=data, method=method)
 
     def url(self, filename):
         """Generate the url for a filename.

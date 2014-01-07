@@ -1,5 +1,10 @@
 import sys
-
+try:
+    from urlparse import urljoin
+    import urllib2 as http
+except ImportError:
+    from urllib.parse import urljoin
+    from urllib import request as http
 
 if sys.version_info[0] == 3:
     string_type = str

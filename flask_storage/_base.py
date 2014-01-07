@@ -11,12 +11,7 @@
 import os
 import logging
 from werkzeug import FileStorage
-try:
-    from urlparse import urljoin
-    import urllib2 as http
-except ImportError:
-    from urllib.parse import urljoin
-    from urllib import request as http
+
 
 __all__ = (
     'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
@@ -115,24 +110,3 @@ class UploadNotAllowed(Exception):
 
 class UploadFileExists(Exception):
     """This exception is raised when the uploaded file exits."""
-
-
-def make_request(uri, headers=None, data=None, method=None):
-    if headers is None:
-        headers = {}
-
-    if data and not method:
-        method = 'POST'
-    elif not method:
-        method = 'GET'
-
-    log.debug('Request %r with %r method' % (uri, method))
-    req = http.Request(uri, headers=headers, data=data)
-    req.get_method = lambda: method.upper()
-    try:
-        resp = http.urlopen(req)
-    except http.HTTPError as resp:
-        pass
-    content = resp.read()
-    resp.close()
-    return resp, content
