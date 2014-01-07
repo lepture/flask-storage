@@ -6,13 +6,13 @@
     Storage for SAE backend.
 """
 
-from .._base import BaseStorage
+from ._base import BaseStorage
+from ._utils import ConfigItem
 
 
 class SaeStorage(BaseStorage):
-    @property
-    def bucket(self):
-        return self.config.get('STORAGE_SAE_BUCKET')
+
+    bucket = ConfigItem('STORAGE_SAE_BUCKET')
 
     def save(self):
-        pass
+        pass  # TODO

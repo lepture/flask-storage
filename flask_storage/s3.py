@@ -9,33 +9,34 @@
 """
 
 import mimetypes
+
 from werkzeug import cached_property
 from boto.s3.connection import S3Connection
+
 from ._base import BaseStorage, urljoin
+from ._utils import ConfigItem
 
 
 class S3Storage(BaseStorage):
+
+    _params = ConfigItem('connection_params')
+
+    access_key = ConfigItem('access_key', required=True)
+    secret_key = ConfigItem('secret_key', required=True)
+    bucket_name = ConfigItem('bucket', required=True)
+
+    folder = ConfigItem('folder')
+    base_url = ConfigItem('base_url')
+
     @cached_property
     def _connection(self):
-        access_key = self.config.get('access_key')
-        secret_key = self.config.get('secret_key')
-
-        assert access_key
-        assert secret_key
-
-        params = self.config.get('connection_params', {})
-        return S3Connection(access_key, secret_key, **params)
+        return S3Connection(self.access_key, self.secret_key, **self._params)
 
     @cached_property
     def bucket(self):
-        name = self.config.get('bucket')
-        if name not in self._connection:
-            return self._connection.create_bucket(name)
-        return self._connection.get_bucket(name)
-
-    @cached_property
-    def folder(self):
-        return self.config.get('folder')
+        if self.bucket_name not in self._connection:
+            return self._connection.create_bucket(self.bucket_name)
+        return self._connection.get_bucket(self.bucket_name)
 
     def url(self, filename):
         """Generate the url for a filename.
@@ -44,8 +45,7 @@ class S3Storage(BaseStorage):
         """
         if self.folder:
             filename = '%s/%s' % (self.folder, filename)
-        urlbase = self.config.get('base_url')
-        return urljoin(urlbase, filename)
+        return urljoin(self.base_url, filename)
 
     def read(self, filename):
         if self.folder:
