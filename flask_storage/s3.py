@@ -25,7 +25,7 @@ class S3Storage(BaseStorage):
     secret_key = ConfigItem('secret_key', required=True)
     bucket_name = ConfigItem('bucket', required=True)
 
-    folder = ConfigItem('folder')
+    base_dir = ConfigItem('base_dir')
     base_url = ConfigItem('base_url')
 
     @cached_property
@@ -43,21 +43,21 @@ class S3Storage(BaseStorage):
 
         :param filename: filename for generating the url
         """
-        if self.folder:
-            filename = '%s/%s' % (self.folder, filename)
+        if self.base_dir:
+            filename = '%s/%s' % (self.base_dir, filename)
         return urljoin(self.base_url, filename)
 
     def read(self, filename):
-        if self.folder:
-            filename = '%s/%s' % (self.folder, filename)
+        if self.base_dir:
+            filename = '%s/%s' % (self.base_dir, filename)
         k = self.bucket.get_key(filename)
         if not k:
             return None
         return k.read()
 
     def _generate_key(self, filename, headers=None):
-        if self.folder:
-            filename = '%s/%s' % (self.folder, filename)
+        if self.base_dir:
+            filename = '%s/%s' % (self.base_dir, filename)
 
         k = self.bucket.new_key(filename)
         if not headers or 'Content-Type' not in headers:
