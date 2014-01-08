@@ -8,11 +8,10 @@
     :copyright: (c) 2013 Hsiaoming Yang.
 """
 
-# flake8: noqa
-
-from ._info import VERSION as __version__
-from ._info import AUTHOR as __author__
 from werkzeug.utils import import_string
+
+__version__ = '0.1.0'
+__author__ = 'Hsiaoming Yang <me@lepture.com>'
 
 
 backends = {

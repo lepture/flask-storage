@@ -7,29 +7,41 @@ try:
 except ImportError:
     from distutils.core import setup
 
-import imp
-from email.utils import parseaddr
+import re
 
-info = imp.load_source('info', 'flask_storage/_info.py')
-author, author_email = parseaddr(info.AUTHOR)
+
+def fread(filepath):
+    with open(filepath) as f:
+        return f.read()
+
+
+def version():
+    content = fread('flask_storage/__init__.py')
+    m = re.findall(r'__version__\s*=\s*\'(.*)\'', content)
+    return m[0]
+
 
 setup(
-    name=info.NAME,
-    version=info.VERSION,
-    author=author,
-    author_email=author_email,
-    url=info.REPOSITORY,
+    name='Flask-Storage',
+    version=version(),
+    author='Hsiaoming Yang',
+    author_email='me@lepture.com',
+    url='https://github.com/lepture/flask-storage',
     packages=["flask_storage"],
     description="Flask upload and storage extensions.",
-    long_description=open('README.rst').read(),
-    license=open('LICENSE').read(),
+    long_description=fread('README.rst'),
+    license='BSD',
     platforms='any',
     zip_safe=False,
     include_package_data=True,
     install_requires=[
         'Flask',
-        'boto',
+        # 'boto',
     ],
+    tests_require=[
+        'nose',
+    ],
+    test_suite='nose.collector',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
