@@ -44,19 +44,17 @@ def http_request(uri, headers=None, data=None, method=None):
 class UpyunStorage(BaseStorage):
 
     bucket = ConfigItem('bucket')
-    folder = ConfigItem('folder')
+    base_dir = ConfigItem('base_dir')
     base_url = ConfigItem('base_url', default=_missing)
 
     username = ConfigItem('username')
     password = ConfigItem('password')
 
-    is_testing = ConfigItem('TESTING')
-
     @property
     def root(self):
         uri = 'http://v0.api.upyun.com/%s/' % self.bucket
-        if self.folder:
-            uri = urljoin(uri, self.folder)
+        if self.base_dir:
+            uri = urljoin(uri, self.base_dir)
         return uri
 
     def request(self, uri, data=None, method=None, headers=None):
@@ -70,8 +68,6 @@ class UpyunStorage(BaseStorage):
             headers = {}
 
         headers['Authorization'] = 'Basic %s' % auth
-        if self.is_testing:
-            return (0, 0)
         return http_request(uri, headers=headers, data=data, method=method)
 
     def url(self, filename):
@@ -84,8 +80,8 @@ class UpyunStorage(BaseStorage):
         else:
             base_url = self.base_url
 
-        if self.folder:
-            urlbase = urljoin(base_url, self.folder)
+        if self.base_dir:
+            urlbase = urljoin(base_url, self.base_dir)
 
         return urljoin(urlbase, filename)
 
