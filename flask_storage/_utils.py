@@ -12,7 +12,7 @@ class ConfigItem(object):
     """
 
     def __init__(self, name, namespace="config", default=None, required=False):
-        self.name = self.name
+        self.name = name
         self.namespace = namespace
         self.default = default
         self.is_required = required
