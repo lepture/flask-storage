@@ -34,9 +34,7 @@ class Storage(object):
             self.init_app(app)
 
     def init_app(self, app):
-        self.app = app
-        app.config.setdefault('STORAGE_TYPE', 'local')
-        t = app.config.get('STORAGE_TYPE')
+        t = app.config.setdefault('STORAGE_TYPE', 'local')
         assert t in backends, "Storage type not supported."
 
         Backend = import_string(backends[t])
