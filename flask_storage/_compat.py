@@ -12,6 +12,9 @@ else:
     string_type = unicode
 
 
+__all__ = ['urljoin', 'http', 'string_type', 'to_bytes']
+
+
 def to_bytes(text):
     if isinstance(text, string_type):
         text = text.encode('utf-8')
