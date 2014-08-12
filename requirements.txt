@@ -1,2 +1,3 @@
+qiniu
+boto
 Flask
-Flask-Testing

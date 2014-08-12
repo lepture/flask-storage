@@ -27,5 +27,5 @@ class TestLocalStorage(BaseCase):
     def test_upload(self):
         response = self.upload()
         assert response.status_code == 200
-        assert response.data == '/url/flask.png'
+        assert response.data == b'/url/flask.png'
         assert os.path.exists('tmp/flask.png')
