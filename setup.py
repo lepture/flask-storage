@@ -21,6 +21,13 @@ def version():
     return m[0]
 
 
+extras_require = dict(
+    qiniu=['qiniu'],
+    s3=['boto'],
+    full=['qiniu', 'boto'],
+)
+
+
 setup(
     name='Flask-Storage',
     version=version(),
@@ -36,11 +43,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'Flask',
-        # 'boto',
     ],
     tests_require=[
         'nose',
     ],
+    extras_require=extras_require,
     test_suite='nose.collector',
     classifiers=[
         'Development Status :: 3 - Alpha',
