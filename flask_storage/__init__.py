@@ -18,6 +18,7 @@ backends = {
     'local': 'flask_storage.local.LocalStorage',
     's3': 'flask_storage.s3.S3Storage',
     'upyun': 'flask_storage.upyun.UpyunStorage',
+    'qiniu': 'flask_storage.qiniu.QiniuStorage',
 }
 
 
