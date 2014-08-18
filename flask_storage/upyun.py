@@ -9,7 +9,6 @@
 """
 
 import os
-import log
 import base64
 
 from ._base import BaseStorage
@@ -29,7 +28,6 @@ def http_request(uri, headers=None, data=None, method=None):
     elif not method:
         method = 'GET'
 
-    log.debug('Request %r with %r method' % (uri, method))
     req = http.Request(uri, headers=headers, data=data)
     req.get_method = lambda: method.upper()
     try:
