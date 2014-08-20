@@ -15,7 +15,7 @@ class ConfigItem(object):
         self.name = name
         self.namespace = namespace
         self.default = default
-        self.is_required = required
+        self.required = required
 
     def __repr__(self):
         template = "ConfigItem(%r, namespace=%r, default=%r, required=%r)"
