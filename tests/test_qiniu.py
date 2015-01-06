@@ -13,12 +13,12 @@ class TestQiniuStorage(BaseCase):
 
     def setUp(self):
         super(TestQiniuStorage, self).setUp()
-        self.io = self.patch('qiniu.io')
-        self.upload_token = self.patch('qiniu.rs.PutPolicy.token')
+        self.put_data = self.patch('qiniu.put_data')
+        # self.upload_token = self.patch('qiniu.rs.PutPolicy.token')
 
     def test_upload(self):
         ret, err = {'key': 'flask.png'}, None
-        self.io.put.return_value = ret, err
+        self.put_data.return_value = ret, err
         response = self.upload()
-        assert self.upload_token.call_count == 1
-        assert self.io.put.call_count == 1
+        # assert self.upload_token.call_count == 1
+        assert self.put_data.call_count == 1
