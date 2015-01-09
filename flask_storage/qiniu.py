@@ -9,9 +9,7 @@
 from __future__ import absolute_import
 
 from werkzeug import cached_property
-import qiniu.rs
-import qiniu.io
-import qiniu.conf
+import qiniu
 
 from ._base import BaseStorage
 from ._compat import urljoin
@@ -32,15 +30,14 @@ class QiniuStorage(BaseStorage):
 
     def __init__(self, name, extensions, config):
         super(QiniuStorage, self).__init__(name, extensions, config)
-        self.init_config()
 
-    def init_config(self):
-        qiniu.conf.ACCESS_KEY = self.access_key
-        qiniu.conf.SECRET_KEY = self.secret_key
+    @cached_property
+    def auth(self):
+        return qiniu.Auth(self.access_key, self.secret_key)
 
     @cached_property
     def _client(self):
-        return qiniu.rs.Client()
+        return qiniu.BucketManager(self.auth)
 
     def url(self, filename):
         """Generate the url for a filename.
@@ -64,18 +61,17 @@ class QiniuStorage(BaseStorage):
                     Otherwise, client can modify the file.
         """
         if filename:
-            scope = '%s:%s' % (self.bucket, filename)
+            token = self.auth.upload_token(self.bucket, filename)
         else:
-            scope = self.bucket
-        policy = qiniu.rs.PutPolicy(scope)
-        return policy.token()
+            token = self.auth.upload_token(self.bucket)
+        return token
 
     def save(self, storage, filename, token=None, extra=None):
         self.check(storage)
         if token is None:
             token = self.generate_upload_token()
         stream = storage.stream
-        ret, err = qiniu.io.put(token, filename, stream, extra=extra)
+        ret, err = qiniu.put_data(token, filename, stream)
         if err:
             raise QiniuException(err)
         return ret
