@@ -50,9 +50,9 @@ class QiniuStorage(BaseStorage):
             base_url = self.base_url
 
         if self.base_dir:
-            urlbase = urljoin(base_url, self.base_dir)
+            base_url = urljoin(base_url, self.base_dir)
 
-        return urljoin(urlbase, filename)
+        return urljoin(base_url, filename)
 
     def generate_upload_token(self, filename=None):
         """
@@ -71,15 +71,15 @@ class QiniuStorage(BaseStorage):
         if token is None:
             token = self.generate_upload_token()
         stream = storage.stream
-        ret, err = qiniu.put_data(token, filename, stream)
-        if err:
-            raise QiniuException(err)
+        ret, info = qiniu.put_data(token, filename, stream)
+        if ret is None:
+            raise QiniuException(info)
         return ret
 
     def delete(self, filename):
-        ret, err = self._client.delete(self.bucket, filename)
-        if err:
-            raise QiniuException(err)
+        ret, info = self._client.delete(self.bucket, filename)
+        if ret is None:
+            raise QiniuException(info)
         return ret
 
 
