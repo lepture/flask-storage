@@ -6,7 +6,9 @@ Flask-Storage is a collection of backends for file storage.
 The built-in backends:
 
 - Local backend
-- Upyun backend (https://www.upyun.com/)
+- Upyun backend
+- Qiniu backend
+- S3 backend
 
 
 Installation
