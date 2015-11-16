@@ -17,7 +17,7 @@ from ._compat import urljoin
 __all__ = (
     'TEXT', 'DOCUMENTS', 'IMAGES', 'AUDIO', 'DATA', 'SCRIPTS',
     'ARCHIVES', 'EXECUTABLES', 'BaseStorage',
-    'UploadNotAllowed', 'UploadFileExists', 'make_request'
+    'UploadNotAllowed', 'UploadFileExists'
 )
 
 log = logging.getLogger('flask_storage')
@@ -25,6 +25,7 @@ log = logging.getLogger('flask_storage')
 TEXT = ('txt',)
 
 DOCUMENTS = (
+    'md', 'rst', 'pdf',
     'rtf', 'odf', 'ods', 'gnumeric', 'abw',
     'doc', 'docx', 'xls', 'xlsx'
 )
@@ -81,13 +82,13 @@ class BaseStorage(object):
                     # check storage before saving it
                     self.check(storage)
         """
-        if not isinstance(storage, FileStorage):
+        try:
+            _, extname = os.path.splitext(storage.filename)
+        except AttributeError:
             raise TypeError('storage must be a werkzeug.FileStorage')
-
-        _, extname = os.path.splitext(storage.filename)
         ext = extname.lower()[1:]
         if not self.extension_allowed(ext):
-            raise UploadNotAllowed('Extension not allowed')
+            raise UploadNotAllowed('Extension not allowed: .%s' % ext)
 
     def exists(self, filename):
         raise NotImplementedError
