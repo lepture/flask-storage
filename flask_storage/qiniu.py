@@ -7,7 +7,7 @@
 """
 
 from __future__ import absolute_import
-
+import os
 from werkzeug import cached_property
 import qiniu
 
@@ -16,17 +16,16 @@ from ._compat import urljoin
 from ._utils import ConfigItem
 
 
-_missing = object()
-
-
 class QiniuStorage(BaseStorage):
 
     access_key = ConfigItem('access_key', required=True)
     secret_key = ConfigItem('secret_key', required=True)
 
     bucket = ConfigItem('bucket', required=True)
-    base_url = ConfigItem('base_url', default=_missing)
+    base_url = ConfigItem('base_url', required=True)
     base_dir = ConfigItem('base_dir')
+    private = ConfigItem('private', default=False)
+    expires = ConfigItem('expires', default=3600)
 
     def __init__(self, name, extensions, config):
         super(QiniuStorage, self).__init__(name, extensions, config)
@@ -44,15 +43,12 @@ class QiniuStorage(BaseStorage):
 
         :param filename: Name of the file.
         """
-        if self.base_url is _missing:
-            base_url = 'http://%s.qiniudn.com/' % self.bucket
-        else:
-            base_url = self.base_url
+        base_url = urljoin(self.base_url, self.base_dir) if self.base_dir else self.base_url
 
-        if self.base_dir:
-            base_url = urljoin(base_url, self.base_dir)
-
-        return urljoin(base_url, filename)
+        file_url = urljoin(base_url, filename)
+        if self.private:
+            return self.auth.private_download_url(file_url, expires=self.expires)
+        return file_url
 
     def generate_upload_token(self, filename=None):
         """
@@ -66,8 +62,16 @@ class QiniuStorage(BaseStorage):
             token = self.auth.upload_token(self.bucket)
         return token
 
-    def save(self, storage, filename, token=None, extra=None):
+    def save(self, storage, filename, token=None):
         self.check(storage)
+
+        _, extname = os.path.splitext(filename)
+        ext = extname.lower()[1:]
+        if not self.extension_allowed(ext):
+            _, extname = os.path.splitext(storage.filename)
+            ext = extname.lower()[1:]
+            filename = '{}.{}'.format(filename, ext) if ext else filename
+
         if token is None:
             token = self.generate_upload_token()
         stream = storage.stream
