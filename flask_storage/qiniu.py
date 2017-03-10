@@ -78,7 +78,7 @@ class QiniuStorage(BaseStorage):
         ret, info = qiniu.put_data(token, filename, stream)
         if ret is None:
             raise QiniuException(info)
-        return ret
+        return ret.get('key')
 
     def delete(self, filename):
         ret, info = self._client.delete(self.bucket, filename)
