@@ -24,9 +24,9 @@ class LocalStorage(BaseStorage):
         - base_dir: save file in base dir
         - base_url: base url root
     """
-    base_path = ConfigItem('base_path')
+    base_path = ConfigItem('base_path', required=True)
     base_dir = ConfigItem('base_dir', default='')
-    base_url = ConfigItem('base_url')
+    base_url = ConfigItem('base_url', default='')
     secret_key = ConfigItem('secret_key')
     expires = ConfigItem('expires', default=3600)
     private = ConfigItem('private', default=False)
