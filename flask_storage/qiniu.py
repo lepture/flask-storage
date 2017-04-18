@@ -23,7 +23,7 @@ class QiniuStorage(BaseStorage):
 
     bucket = ConfigItem('bucket', required=True)
     base_url = ConfigItem('base_url', required=True)
-    base_dir = ConfigItem('base_dir')
+    base_dir = ConfigItem('base_dir', default='')
     private = ConfigItem('private', default=False)
     expires = ConfigItem('expires', default=3600)
 
@@ -38,14 +38,14 @@ class QiniuStorage(BaseStorage):
     def _client(self):
         return qiniu.BucketManager(self.auth)
 
-    def url(self, filename):
+    def url(self, filename, base_dir=None):
         """Generate the url for a filename.
 
         :param filename: Name of the file.
         """
-        base_url = urljoin(self.base_url, self.base_dir) if self.base_dir else self.base_url
+        filename = os.path.join(base_dir or self.base_dir, filename)
 
-        file_url = urljoin(base_url, filename)
+        file_url = urljoin(self.base_url, filename)
         if self.private:
             return self.auth.private_download_url(file_url, expires=self.expires)
         return file_url
@@ -62,8 +62,10 @@ class QiniuStorage(BaseStorage):
             token = self.auth.upload_token(self.bucket)
         return token
 
-    def save(self, storage, filename, token=None):
+    def save(self, storage, filename=None, base_dir=None, token=None):
         self.check(storage)
+
+        filename = filename if filename else storage.filename
 
         _, extname = os.path.splitext(filename)
         ext = extname.lower()[1:]
@@ -72,15 +74,18 @@ class QiniuStorage(BaseStorage):
             ext = extname.lower()[1:]
             filename = '{}.{}'.format(filename, ext) if ext else filename
 
+        full_filename = os.path.join(base_dir or self.base_dir, filename)
+
         if token is None:
             token = self.generate_upload_token()
         stream = storage.stream
-        ret, info = qiniu.put_data(token, filename, stream)
+        ret, info = qiniu.put_data(token, full_filename, stream)
         if ret is None:
             raise QiniuException(info)
-        return ret
+        return filename
 
-    def delete(self, filename):
+    def delete(self, filename, base_dir=None):
+        filename = os.path.join(base_dir or self.base_dir, filename)
         ret, info = self._client.delete(self.bucket, filename)
         if ret is None:
             raise QiniuException(info)
