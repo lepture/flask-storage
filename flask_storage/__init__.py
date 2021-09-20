@@ -10,7 +10,7 @@
 
 from werkzeug.utils import import_string
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __author__ = 'Hsiaoming Yang <me@lepture.com>'
 
 
