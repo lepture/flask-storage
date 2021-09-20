@@ -10,7 +10,10 @@
 
 import os
 import logging
-from werkzeug import FileStorage
+try:
+    from werkzeug.datastructures import FileStorage
+except ImportError:
+    from werkzeug import FileStorage
 from ._compat import urljoin
 
 
