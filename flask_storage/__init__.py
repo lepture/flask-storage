@@ -21,6 +21,8 @@ backends = {
     'qiniu': 'flask_storage.qiniu.QiniuStorage',
 }
 
+from _base import *
+
 
 class Storage(object):
     """Create a storage instance.
